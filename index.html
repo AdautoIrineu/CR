@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d1117">
+<meta name="description" content="Checklist interativo para documentação CR Exército e CRC/CLF da Polícia Federal.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/icon-maskable.svg">
+<title>Checklist — CR Exército / CRC e CLF PF — Magellan Minerais</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --text-dim: #484f58;
+
+    --s-pending-bg:    transparent;
+    --s-pending-bd:    #30363d;
+    --s-pending-tx:    #7d8590;
+
+    --s-progress-bg:   rgba(88, 166, 255, 0.10);
+    --s-progress-bd:   rgba(88, 166, 255, 0.40);
+    --s-progress-tx:   #58a6ff;
+
+    --s-done-bg:       rgba(63, 185, 80, 0.10);
+    --s-done-bd:       rgba(63, 185, 80, 0.45);
+    --s-done-tx:       #3fb950;
+
+    --s-blocked-bg:    rgba(248, 81, 73, 0.10);
+    --s-blocked-bd:    rgba(248, 81, 73, 0.40);
+    --s-blocked-tx:    #f85149;
+
+    --s-na-bg:         rgba(110, 118, 129, 0.10);
+    --s-na-bd:         rgba(110, 118, 129, 0.30);
+    --s-na-tx:         #6e7681;
+
+    --warn: #d29922;
+    --red: #f85149;
+    --blue: #58a6ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 26px 32px 22px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .title-block h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .title-block .subtitle {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .title-block .company {
+    font-size: 0.82rem;
+    color: var(--blue);
+    margin-top: 5px;
+    font-weight: 600;
+  }
+
+  .header-actions { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 5px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .btn-ghost:hover { border-color: var(--red); color: var(--red); }
+  .btn-install { display: none; }
+
+  .progress-wrap { width: 100%; margin-bottom: 14px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .progress-label { font-size: 0.7rem; font-family: 'DM Mono', monospace; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .progress-pct { font-family: 'DM Mono', monospace; font-size: 1.35rem; font-weight: 500; color: var(--s-done-tx); }
+
+  .progress-track { width: 100%; height: 10px; background: var(--surface2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); display: flex; }
+  .progress-seg { height: 100%; transition: width 0.45s cubic-bezier(0.4,0,0.2,1); }
+  .progress-seg.done { background: #3fb950; box-shadow: 0 0 6px rgba(63,185,80,0.4); }
+  .progress-seg.progress { background: #58a6ff; }
+  .progress-seg.blocked { background: #f85149; }
+
+  .stats-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 11px; font-family: 'DM Mono', monospace; font-size: 0.72rem; display: flex; align-items: center; gap: 6px; }
+  .stat-pill .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .stat-pill .dot.pending { background: #484f58; }
+  .stat-pill .dot.progress { background: #58a6ff; }
+  .stat-pill .dot.done { background: #3fb950; }
+  .stat-pill .dot.blocked { background: #f85149; }
+  .stat-pill .dot.na { background: #6e7681; }
+  .stat-pill .slabel { color: var(--text-muted); }
+  .stat-pill .sval { color: var(--text); font-weight: 500; }
+
+  .filter-bar { padding: 14px 32px 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 0.76rem; font-weight: 500; padding: 4px 11px; border-radius: 6px; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+  .filter-btn .fdot { width: 6px; height: 6px; border-radius: 50%; }
+  .filter-btn:hover { border-color: #58a6ff; color: var(--text); }
+  .filter-btn.active-all { background: rgba(48,54,61,0.4); border-color: #58a6ff; color: var(--text); }
+  .filter-btn.active-pendente { background: rgba(72,79,88,0.15); border-color: #484f58; color: #9ca3af; }
+  .filter-btn.active-andamento { background: var(--s-progress-bg); border-color: var(--s-progress-bd); color: var(--s-progress-tx); }
+  .filter-btn.active-concluido { background: var(--s-done-bg); border-color: var(--s-done-bd); color: var(--s-done-tx); }
+  .filter-btn.active-pendencia { background: var(--s-blocked-bg); border-color: var(--s-blocked-bd); color: var(--s-blocked-tx); }
+
+  .container { padding: 20px 32px 0; max-width: 960px; }
+  .block { margin-bottom: 24px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .block.hidden { display: none; }
+  .block-header { display: flex; align-items: center; padding: 13px 18px; background: var(--surface2); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; gap: 12px; }
+  .block-header:hover { background: #1a2030; }
+  .block-title { flex: 1; font-family: 'DM Mono', monospace; font-size: 0.65rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+  .block-title span { font-family: 'DM Sans', sans-serif; font-size: 0.86rem; font-weight: 600; color: var(--text); text-transform: none; letter-spacing: 0; display: block; margin-top: 2px; }
+  .block-mini { display: flex; align-items: center; gap: 8px; }
+  .block-track { width: 72px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; display: flex; }
+  .block-seg { height: 100%; transition: width 0.35s ease; }
+  .block-seg.done { background: #3fb950; }
+  .block-seg.progress { background: #58a6ff; }
+  .block-seg.blocked { background: #f85149; }
+  .block-count { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; min-width: 32px; text-align: right; }
+  .block-count.complete { color: #3fb950; }
+  .block-chevron { color: var(--text-dim); font-size: 0.65rem; transition: transform 0.22s; flex-shrink: 0; }
+  .block.collapsed .block-body { display: none; }
+  .block.collapsed .block-chevron { transform: rotate(-90deg); }
+
+  .item { display: flex; align-items: flex-start; gap: 0; border-bottom: 1px solid rgba(48,54,61,0.6); transition: background 0.1s; position: relative; }
+  .item:last-child { border-bottom: none; }
+  .item::before { content: ''; width: 3px; align-self: stretch; flex-shrink: 0; transition: background 0.2s; }
+  .item[data-status="pending"]::before { background: transparent; }
+  .item[data-status="progress"]::before { background: #58a6ff; }
+  .item[data-status="done"]::before { background: #3fb950; }
+  .item[data-status="blocked"]::before { background: #f85149; }
+  .item[data-status="na"]::before { background: #6e7681; }
+  .item[data-status="progress"] { background: rgba(88,166,255,0.03); }
+  .item[data-status="done"] { background: rgba(63,185,80,0.04); }
+  .item[data-status="blocked"] { background: rgba(248,81,73,0.04); }
+  .item[data-status="na"] { background: rgba(110,118,129,0.03); }
+
+  .item-inner { display: flex; align-items: flex-start; gap: 12px; padding: 11px 16px; flex: 1; }
+  .item-num { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--text-dim); min-width: 20px; padding-top: 1px; flex-shrink: 0; }
+  .item[data-status="done"] .item-num { color: #3fb950; }
+  .item[data-status="progress"] .item-num { color: #58a6ff; }
+  .item[data-status="blocked"] .item-num { color: #f85149; }
+  .item-content { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+  .item-text { font-size: 0.84rem; line-height: 1.55; color: var(--text-muted); transition: color 0.15s; }
+  .item[data-status="done"] .item-text { color: var(--text-dim); text-decoration: line-through; text-decoration-color: #484f58; }
+  .item[data-status="na"] .item-text { color: var(--text-dim); font-style: italic; }
+
+  .tag-validade { display: inline-flex; align-items: flex-start; gap: 5px; font-family: 'DM Mono', monospace; font-size: 0.59rem; line-height: 1.5; background: rgba(210,153,34,0.07); border: 1px solid rgba(210,153,34,0.22); color: #9a7010; padding: 3px 8px; border-radius: 4px; width: fit-content; max-width: 500px; }
+
+  .status-selector { display: flex; align-items: center; gap: 4px; flex-shrink: 0; padding-top: 1px; }
+  .status-btn { display: flex; align-items: center; gap: 4px; font-family: 'DM Mono', monospace; font-size: 0.6rem; padding: 3px 7px; border-radius: 5px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s; white-space: nowrap; background: transparent; color: var(--text-dim); letter-spacing: 0.02em; }
+  .status-btn .sicon { font-size: 0.65rem; }
+  .status-btn.s-pending { border-color: var(--border); color: var(--text-dim); }
+  .status-btn.s-pending:hover, .status-btn.s-pending.active { background: rgba(72,79,88,0.2); border-color: #7d8590; color: #c9d1d9; }
+  .status-btn.s-progress:hover, .status-btn.s-progress.active { background: var(--s-progress-bg); border-color: var(--s-progress-bd); color: var(--s-progress-tx); }
+  .status-btn.s-done:hover, .status-btn.s-done.active { background: var(--s-done-bg); border-color: var(--s-done-bd); color: var(--s-done-tx); }
+  .status-btn.s-blocked:hover, .status-btn.s-blocked.active { background: var(--s-blocked-bg); border-color: var(--s-blocked-bd); color: var(--s-blocked-tx); }
+  .status-btn.s-na:hover, .status-btn.s-na.active { background: var(--s-na-bg); border-color: var(--s-na-bd); color: var(--s-na-tx); }
+
+  .item-badges { display: none; }
+
+  .legend { margin: 16px 32px 0; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; display: flex; gap: 18px; flex-wrap: wrap; max-width: 960px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--text-muted); }
+  .legend-chip { padding: 2px 7px; border-radius: 4px; font-size: 0.58rem; border: 1px solid; }
+  .lc-pending { background: rgba(72,79,88,0.15); border-color: #484f58; color: #9ca3af; }
+  .lc-progress { background: var(--s-progress-bg); border-color: var(--s-progress-bd); color: var(--s-progress-tx); }
+  .lc-done { background: var(--s-done-bg); border-color: var(--s-done-bd); color: var(--s-done-tx); }
+  .lc-blocked { background: var(--s-blocked-bg); border-color: var(--s-blocked-bd); color: var(--s-blocked-tx); }
+  .lc-na { background: var(--s-na-bg); border-color: var(--s-na-bd); color: var(--s-na-tx); }
+
+  @media (max-width: 640px) {
+    .header { padding: 18px 16px 16px; }
+    .container { padding: 14px 16px 0; }
+    .filter-bar { padding: 12px 16px 0; }
+    .legend { margin: 12px 16px 0; }
+    .status-selector { flex-wrap: wrap; gap: 3px; }
+    .status-btn { font-size: 0.55rem; padding: 2px 5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="title-block">
+      <h1>Checklist de Documentação</h1>
+      <div class="subtitle">CR · Exército Brasileiro &nbsp;|&nbsp; CRC · CLF · Polícia Federal</div>
+      <div class="company">Magellan Minerais Prospecção Geológica LTDA</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="generatePdfReport()">⎙ Gerar PDF</button>
+      <button class="btn-ghost btn-install" id="installBtn">+ Instalar app</button>
+      <button class="btn-ghost" onclick="resetAll()">↺ Resetar tudo</button>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label">Progresso geral</span>
+      <span class="progress-pct" id="pct">0%</span>
+    </div>
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-seg done" id="segDone" style="width:0%"></div>
+      <div class="progress-seg progress" id="segProgress" style="width:0%"></div>
+      <div class="progress-seg blocked" id="segBlocked" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="stats-row" style="margin-top:12px;">
+    <div class="stat-pill"><span class="dot pending"></span><span class="slabel">Pendente</span><span class="sval" id="cntPending">—</span></div>
+    <div class="stat-pill"><span class="dot progress"></span><span class="slabel">Em andamento</span><span class="sval" id="cntProgress">—</span></div>
+    <div class="stat-pill"><span class="dot done"></span><span class="slabel">Concluído</span><span class="sval" id="cntDone">—</span></div>
+    <div class="stat-pill"><span class="dot blocked"></span><span class="slabel">Pendência</span><span class="sval" id="cntBlocked">—</span></div>
+    <div class="stat-pill"><span class="dot na"></span><span class="slabel">N/A</span><span class="sval" id="cntNa">—</span></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="legend-chip lc-pending">Pendente</span> Ainda não iniciado — peso 0%</div>
+  <div class="legend-item"><span class="legend-chip lc-progress">Em andamento</span> Processo iniciado / aguardando — peso 50%</div>
+  <div class="legend-item"><span class="legend-chip lc-done">Concluído</span> Documento obtido / etapa finalizada — peso 100%</div>
+  <div class="legend-item"><span class="legend-chip lc-blocked">Pendência</span> Emissão negada ou bloqueada — peso 0%</div>
+  <div class="legend-item"><span class="legend-chip lc-na">N/A</span> Não se aplica a este processo — peso 100%</div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active-all" onclick="setFilter('all',this)">Todos</button>
+  <button class="filter-btn" onclick="setFilter('pendente',this)"><span class="fdot" style="background:#484f58"></span>Pendentes</button>
+  <button class="filter-btn" onclick="setFilter('andamento',this)"><span class="fdot" style="background:#58a6ff"></span>Em andamento</button>
+  <button class="filter-btn" onclick="setFilter('concluido',this)"><span class="fdot" style="background:#3fb950"></span>Concluídos</button>
+  <button class="filter-btn" onclick="setFilter('pendencia',this)"><span class="fdot" style="background:#f85149"></span>Com pendência</button>
+</div>
+
+<div class="container" id="container"></div>
+
+<script>
+const MSG_VAL = 'Atenção: este documento possui prazo de validade. A emissão antecipada não garante validade no momento da apresentação ao órgão.';
+const STATUSES = [
+  { key:'pending', icon:'○', label:'Pendente', cls:'s-pending' },
+  { key:'progress', icon:'◑', label:'Em andamento', cls:'s-progress' },
+  { key:'done', icon:'●', label:'Concluído', cls:'s-done' },
+  { key:'blocked', icon:'✕', label:'Pendência', cls:'s-blocked' },
+  { key:'na', icon:'–', label:'N/A', cls:'s-na' },
+];
+
+const BLOCKS = [
+  { id:'b1', num:'BLOCO 1', title:'Pessoa Jurídica — Empresa', items:[
+    {n:1,text:'Contrato Social consolidado com todas as alterações, registrado na Junta Comercial'},
+    {n:2,text:'Última alteração contratual registrada (se não consolidada no item anterior)'},
+    {n:3,text:'Comprovante de inscrição e situação cadastral no CNPJ — emissão recente'},
+    {n:4,text:'Alvará de Funcionamento e Localização em vigor (Prefeitura)'},
+    {n:5,text:'Comprovante de endereço da sede (conta de água, luz, telefone ou contrato de locação)'},
+    {n:6,text:'Comprovante de endereço do local de armazenamento/operação (se diferente da sede)'},
+    {n:7,text:'Certidão Negativa de Débitos Federais e Dívida Ativa da União (Receita Federal / PGFN)',c:true,v:true},
+    {n:8,text:'Certidão Negativa de Débitos Estaduais (SEFA/PA)',c:true,v:true},
+    {n:9,text:'Certidão Negativa de Débitos Municipais (Prefeitura de Itaituba)',c:true,v:true},
+    {n:10,text:'Certidão Negativa de Débitos Trabalhistas — CNDT (TST)',c:true,v:true},
+    {n:11,text:'Certificado de Regularidade do FGTS — CRF (CEF)',c:true,v:true},
+    {n:12,text:'Título Minerário / Portaria de Lavra vigente (ANM)'},
+    {n:13,text:'Licença Ambiental vigente — LO ou equivalente (SEMAS-PA)'}] },
+  { id:'b2', num:'BLOCO 2', title:'Sócios e Diretores — por pessoa', items:[
+    {n:14,text:'Cópia do RG — frente e verso (cada sócio/diretor)'},
+    {n:15,text:'Cópia do CPF ou documento único com CPF (cada sócio/diretor)'},
+    {n:16,text:'Comprovante de residência atualizado — últimos 3 meses (cada sócio/diretor)'},
+    {n:17,text:'Certidão de Antecedentes Criminais — Justiça Federal / TRF',c:true,v:true},
+    {n:18,text:'Certidão de Antecedentes Criminais — Justiça Estadual / TJPA (incluindo Juizados Especiais)',c:true,v:true},
+    {n:19,text:'Certidão de Antecedentes Criminais — Justiça Militar (STM)',c:true,v:true},
+    {n:20,text:'Certidão de Antecedentes Criminais — Justiça Eleitoral (TSE / TRE)',c:true,v:true},
+    {n:21,text:'Certidão de Antecedentes — Polícia Civil do estado de residência',c:true,v:true},
+    {n:22,text:'Declaração de Idoneidade assinada pelo sócio/diretor (modelo fornecido pela consultora)',c:true},
+    {n:23,text:'Declaração de que não é funcionário público federal (quando exigido pelo órgão)'}] },
+  { id:'b3', num:'BLOCO 3', title:'Responsável Técnico Químico — RT CRQ', items:[
+    {n:24,text:'Cópia do RG — frente e verso'},{n:25,text:'Cópia do CPF'},{n:26,text:'Comprovante de residência atualizado — últimos 3 meses'},
+    {n:27,text:'Diploma de graduação em Química ou área habilitante — frente e verso'},
+    {n:28,text:'Carteira de habilitação profissional do CRQ de origem — frente e verso'},
+    {n:29,text:'Comprovante de quitação da anuidade no CRQ de origem (exercício vigente)'},
+    {n:30,text:'Caderneta profissional (livreto azul) — original física para anotação pelo CRQ-VI em Belém'},
+    {n:31,text:'Certidão de Regularidade Profissional emitida pelo CRQ de origem',v:true},
+    {n:32,text:'Certidão de Antecedentes Criminais — Justiça Federal',c:true,v:true},
+    {n:33,text:'Certidão de Antecedentes Criminais — Justiça Estadual / TJPA',c:true,v:true},
+    {n:34,text:'Certidão de Antecedentes Criminais — Justiça Militar',c:true,v:true},
+    {n:35,text:'Certidão de Antecedentes Criminais — Justiça Eleitoral',c:true,v:true},
+    {n:36,text:'Certidão de Antecedentes — Polícia Civil',c:true,v:true},
+    {n:37,text:'Contrato de prestação de serviços entre o RT Químico e a empresa'},
+    {n:38,text:'Registro do RT perante o CRQ-VI (Pará) — visto de habilitação ou transferência de registro',c:true},
+    {n:39,text:'ART (Anotação de Responsabilidade Técnica) emitida pelo CRQ-VI para a atividade específica',c:true},
+    {n:40,text:'CART (Certificado de Anotação de Responsabilidade Técnica) emitido pelo CRQ-VI',c:true}] },
+  { id:'b4', num:'BLOCO 4', title:'Responsável Técnico — Engenheiro Civil (Galpão)', items:[
+    {n:41,text:'Cópia do RG e CPF do Engenheiro Civil'},
+    {n:42,text:'Registro no CREA/PA vigente'},
+    {n:43,text:'ART do projeto estrutural/civil do galpão de armazenamento de cianeto, registrada no CREA',c:true}] },
+  { id:'b5', num:'BLOCO 5', title:'Documentos Técnicos e Operacionais', items:[
+    {n:44,text:'Plano de Segurança (PCE / equivalente para produtos químicos controlados)',c:true},
+    {n:45,text:'Plano Diretor das instalações — localização do escritório, galpão, paiol, entradas e saídas, perímetros de segurança, etc.'},
+    {n:46,text:'Relação dos produtos controlados: nome, número CAS, quantidades, finalidade e forma de uso'}] },
+  { id:'b6', num:'BLOCO 6', title:'Documentos CRQ-VI — Emissão do CART/ART', items:[
+    {n:47,text:'Requerimento de CART preenchido e assinado (modelo CRQ-VI)',c:true},
+    {n:48,text:'Comprovante de pagamento da ART ao CRQ-VI',c:true},
+    {n:49,text:'Cadastro da empresa no sistema CRQ-VI',c:true}] },
+  { id:'b7', num:'BLOCO 7', title:'Exército Brasileiro — SisGCorp (CR)', items:[
+    {n:50,text:'Requerimento de CR preenchido no SisGCorp',c:true},
+    {n:51,text:'CART emitido pelo CRQ-VI (resultado do Bloco 6)',c:true},
+    {n:52,text:'Pagamento da GRU — emissão CR',c:true}] },
+  { id:'b8', num:'BLOCO 8', title:'Polícia Federal — SIPROQUIM (CRC e CLF)', items:[
+    {n:53,text:'Cadastro da empresa no sistema SIPROQUIM 2',c:true},
+    {n:54,text:'Cadastro e vinculação dos representantes legais no SIPROQUIM',c:true},
+    {n:55,text:'Cadastro e vinculação do RT Químico no SIPROQUIM',c:true},
+    {n:56,text:'Cadastro e vinculação dos operadores no SIPROQUIM',c:true},
+    {n:57,text:'Requerimento de CRC (Certificado de Registro Cadastral) protocolado via SIPROQUIM',c:true},
+    {n:58,text:'Requerimento de CLF (Certificado de Licença para uso) protocolado via SIPROQUIM',c:true},
+    {n:59,text:'Comprovante de pagamento das taxas da PF (GRU)'},
+    {n:60,text:'Declaração de uso final dos produtos controlados (cianeto de sódio, ácido nítrico, etc.)'}] },
+];
+
+const KEY = 'crChecklistMagellanV3';
+const state = JSON.parse(localStorage.getItem(KEY) || '{}');
+const getStatus = n => state[n] || 'pending';
+const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+
+function getCounts() {
+  const counts = { pending:0, progress:0, done:0, blocked:0, na:0, total:0 };
+  BLOCKS.forEach(b => b.items.forEach(it => { counts.total++; counts[getStatus(it.n)]++; }));
+  return counts;
+}
+
+const calcScore = (done, na, progress, total) => total === 0 ? 0 : Math.min(100, Math.round(((done + na + progress * 0.5) / total) * 100));
+
+function updateProgress() {
+  const c = getCounts();
+  const t = c.total;
+  document.getElementById('pct').textContent = calcScore(c.done, c.na, c.progress, t) + '%';
+  document.getElementById('segDone').style.width = Math.round(((c.done + c.na) / t) * 100) + '%';
+  document.getElementById('segProgress').style.width = Math.round(((c.progress * 0.5) / t) * 100) + '%';
+  document.getElementById('segBlocked').style.width = Math.round((c.blocked / t) * 100) + '%';
+  document.getElementById('cntPending').textContent = c.pending;
+  document.getElementById('cntProgress').textContent = c.progress;
+  document.getElementById('cntDone').textContent = c.done;
+  document.getElementById('cntBlocked').textContent = c.blocked;
+  document.getElementById('cntNa').textContent = c.na;
+
+  BLOCKS.forEach(b => {
+    const bc = {done:0, progress:0, blocked:0, na:0};
+    b.items.forEach(it => { const s = getStatus(it.n); if (bc[s] !== undefined) bc[s]++; });
+    const bt = b.items.length;
+    document.getElementById('bseg-done-' + b.id).style.width = Math.round(((bc.done + bc.na) / bt) * 100) + '%';
+    document.getElementById('bseg-prog-' + b.id).style.width = Math.round(((bc.progress * 0.5) / bt) * 100) + '%';
+    document.getElementById('bseg-blk-' + b.id).style.width = Math.round((bc.blocked / bt) * 100) + '%';
+    const score = calcScore(bc.done, bc.na, bc.progress, bt);
+    const countEl = document.getElementById('cnt-' + b.id);
+    countEl.textContent = score + '%';
+    countEl.className = 'block-count' + (score === 100 ? ' complete' : '');
+  });
+}
+
+function setStatus(n, status, event) {
+  event.stopPropagation();
+  state[n] = status;
+  save();
+
+  const itemEl = document.getElementById('item-' + n);
+  itemEl.dataset.status = status;
+  itemEl.querySelectorAll('.status-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.status === status));
+
+  updateProgress();
+  if (currentFilter !== 'all') applyFilter(currentFilter);
+}
+
+const toggleBlock = id => document.getElementById(id).classList.toggle('collapsed');
+
+let currentFilter = 'all';
+const filterActiveClass = { all:'active-all', pendente:'active-pendente', andamento:'active-andamento', concluido:'active-concluido', pendencia:'active-pendencia' };
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => { b.className = 'filter-btn'; });
+  btn.className = 'filter-btn ' + (filterActiveClass[f] || '');
+  applyFilter(f);
+}
+
+function applyFilter(f) {
+  document.querySelectorAll('.item').forEach(el => {
+    const s = getStatus(Number(el.dataset.n));
+    let show = true;
+    if (f === 'pendente') show = s === 'pending';
+    else if (f === 'andamento') show = s === 'progress';
+    else if (f === 'concluido') show = s === 'done';
+    else if (f === 'pendencia') show = s === 'blocked';
+    el.style.display = show ? '' : 'none';
+  });
+
+  BLOCKS.forEach(b => {
+    const bEl = document.getElementById(b.id);
+    const vis = Array.from(bEl.querySelectorAll('.item')).some(el => el.style.display !== 'none');
+    bEl.classList.toggle('hidden', !vis);
+  });
+}
+
+function resetAll() {
+  if (!confirm('Resetar todos os status para "Pendente"?')) return;
+  Object.keys(state).forEach(k => delete state[k]);
+  save();
+  document.querySelectorAll('.item').forEach(el => {
+    el.dataset.status = 'pending';
+    el.querySelectorAll('.status-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.status === 'pending'));
+  });
+  updateProgress();
+}
+
+
+
+function getStatusLabel(status) {
+  const map = {
+    pending: 'Pendente',
+    progress: 'Em andamento',
+    done: 'Concluído',
+    blocked: 'Pendência',
+    na: 'N/A'
+  };
+  return map[status] || 'Pendente';
+}
+
+function generatePdfReport() {
+  const counts = getCounts();
+  const score = calcScore(counts.done, counts.na, counts.progress, counts.total);
+  const now = new Date();
+  const generatedAt = now.toLocaleString('pt-BR');
+
+  const blocksHtml = BLOCKS.map(block => {
+    const itemsHtml = block.items.map(item => {
+      const st = getStatus(item.n);
+      return `<tr>
+        <td>${String(item.n).padStart(2, '0')}</td>
+        <td>${item.text}</td>
+        <td>${getStatusLabel(st)}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <section>
+        <h3>${block.num} — ${block.title}</h3>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Item</th><th>Status</th></tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+      </section>`;
+  }).join('');
+
+  const reportHtml = `<!DOCTYPE html>
+  <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Relatório Checklist Magellan</title>
+    <style>
+      @page { size: A4; margin: 14mm; }
+      body { font-family: Arial, sans-serif; color: #111; font-size: 12px; }
+      h1 { margin-bottom: 4px; font-size: 20px; }
+      .meta { margin-bottom: 14px; color: #444; }
+      .summary { margin: 10px 0 18px; padding: 10px; border: 1px solid #d0d7de; border-radius: 6px; }
+      .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+      section { margin-bottom: 14px; page-break-inside: avoid; }
+      h3 { font-size: 14px; margin: 0 0 8px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border: 1px solid #d0d7de; padding: 6px; vertical-align: top; }
+      th { background: #f6f8fa; text-align: left; }
+      td:first-child { width: 38px; text-align: center; }
+      td:last-child { width: 118px; white-space: nowrap; }
+    </style>
+  </head>
+  <body>
+    <h1>Checklist de Documentação — Magellan Minerais</h1>
+    <div class="meta">Gerado em: ${generatedAt}</div>
+    <div class="summary">
+      <strong>Resumo geral</strong>
+      <div class="summary-grid">
+        <div>Progresso: <strong>${score}%</strong></div>
+        <div>Pendentes: <strong>${counts.pending}</strong></div>
+        <div>Em andamento: <strong>${counts.progress}</strong></div>
+        <div>Concluídos: <strong>${counts.done}</strong></div>
+        <div>Pendências: <strong>${counts.blocked}</strong></div>
+        <div>N/A: <strong>${counts.na}</strong></div>
+      </div>
+    </div>
+    ${blocksHtml}
+    <script>window.onload = () => window.print();<\/script>
+  </body>
+  </html>`;
+
+  const reportWindow = window.open('', '_blank');
+  if (!reportWindow) {
+    alert('Não foi possível abrir a janela de impressão. Verifique se o bloqueador de pop-up está ativo.');
+    return;
+  }
+
+  reportWindow.document.open();
+  reportWindow.document.write(reportHtml);
+  reportWindow.document.close();
+}
+function render() {
+  const container = document.getElementById('container');
+
+  BLOCKS.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'block';
+    div.id = b.id;
+
+    const itemsHtml = b.items.map(it => {
+      const s = getStatus(it.n);
+      const statusBtns = STATUSES.map(st => `
+        <button class="status-btn ${st.cls}${s===st.key?' active':''}"
+          data-status="${st.key}"
+          onclick="setStatus(${it.n},'${st.key}',event)"
+          title="${st.label}">
+          <span class="sicon">${st.icon}</span>${st.label}
+        </button>`).join('');
+
+      return `
+        <div class="item" id="item-${it.n}" data-n="${it.n}" data-status="${s}">
+          <div class="item-inner">
+            <span class="item-num">${String(it.n).padStart(2,'0')}</span>
+            <div class="item-content">
+              <span class="item-text">${it.text}</span>
+              ${it.v ? `<span class="tag-validade">⚠ ${MSG_VAL}</span>` : ''}
+              <div class="status-selector">${statusBtns}</div>
+            </div>
+            <div class="item-badges"></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="block-header" onclick="toggleBlock('${b.id}')">
+        <div class="block-title">${b.num}<span>${b.title}</span></div>
+        <div class="block-mini">
+          <div class="block-track">
+            <div class="block-seg done" id="bseg-done-${b.id}" style="width:0%"></div>
+            <div class="block-seg progress" id="bseg-prog-${b.id}" style="width:0%"></div>
+            <div class="block-seg blocked" id="bseg-blk-${b.id}" style="width:0%"></div>
+          </div>
+          <span class="block-count" id="cnt-${b.id}">0%</span>
+        </div>
+        <span class="block-chevron">▼</span>
+      </div>
+      <div class="block-body">${itemsHtml}</div>`;
+
+    container.appendChild(div);
+  });
+
+  updateProgress();
+}
+
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  deferredPrompt = event;
+  installBtn.style.display = 'inline-flex';
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  installBtn.style.display = 'none';
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.error('Falha ao registrar service worker:', err));
+  });
+}
+
+render();
+</script>
+</body>
+</html>
