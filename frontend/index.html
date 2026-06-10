@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CR Geospatial Intelligence</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="stylesheet" href="/app/styles.css" />
+</head>
+<body>
+  <aside>
+    <h1>Análise mineral, ambiental e fundiária</h1>
+    <label>Nome do projeto <input id="projectName" value="Projeto piloto" /></label>
+    <label>Descrição <textarea id="projectDescription"></textarea></label>
+    <button id="createProject">Criar projeto</button>
+    <p id="projectStatus"></p>
+
+    <h2>AOI</h2>
+    <input id="aoiFile" type="file" accept=".kml,.kmz,.zip,.shp,.geojson,.json" />
+    <button id="uploadAoi">Enviar AOI</button>
+    <p id="aoiStatus"></p>
+
+    <h2>Processamento</h2>
+    <button id="runAnalysis">Executar interseções</button>
+    <button id="buildReports">Gerar QGIS + relatório</button>
+    <pre id="jobStatus"></pre>
+
+    <h2>Sobreposições</h2>
+    <table>
+      <thead><tr><th>Tema</th><th>Fonte</th><th>Camada</th><th>ha</th><th>%</th></tr></thead>
+      <tbody id="overlaps"></tbody>
+    </table>
+  </aside>
+  <main id="map"></main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="/app/main.js"></script>
+</body>
+</html>
