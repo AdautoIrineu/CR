@@ -122,6 +122,15 @@ details[open] summary{margin-bottom:12px}
 .item .meta{font-size:13.5px;color:var(--suave)}
 .loja-t{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);margin:18px 0 0}
 .vazio{color:var(--suave);font-style:italic}
+.novo{display:flex;gap:8px;margin:12px 0 4px}
+.novo input{flex:1;min-width:0}
+.novo .btn{flex:none;padding:11px 16px}
+.item.chk{align-items:center}
+.item.chk label{flex:1;min-width:0;display:flex;gap:12px;align-items:center;cursor:pointer}
+.item.chk label span{overflow-wrap:anywhere;min-width:0}
+.item.chk.feito label span{opacity:.5;text-decoration:line-through}
+.item.chk .x{flex:none;width:34px;height:34px;border-radius:50%;border:0;background:none;color:var(--suave);font-size:20px;line-height:1}
+.conta{font-family:"DM Sans";font-size:13.5px;font-weight:500;color:var(--suave)}
 .aviso{background:#fdf0cf;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:14px}
 
 dialog{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh}
@@ -170,6 +179,8 @@ const fotoUrl = id => `/api/foto/${id}?k=${encodeURIComponent(K)}`;
 
 let dados = { pessoas:{}, lojas:[], outrasLojas:'', recado:'', desejos:[], concluido:null };
 let comprado = {};
+let checklist = { itens: [] };
+let chkPendente = false, chkTimer = null;
 let modo = location.hash === '#resumo' ? 'resumo' : 'form';
 let aba = 'diana';
 let pendente = false, timer = null, enviando = 0;
@@ -208,7 +219,7 @@ async function salvar(){
     return false;
   }
 }
-addEventListener('visibilitychange', () => { if (document.hidden) salvar(); else if (modo==='resumo' && !pendente) carregar(true); });
+addEventListener('visibilitychange', () => { if (document.hidden) salvar(); else if (modo==='resumo' && !pendente && !chkPendente && document.activeElement?.id !== 'novoTxt') carregar(true); });
 
 /* ---------- formulário ---------- */
 function campo(p, k, rotulo, o={}){
@@ -364,6 +375,28 @@ function itemDesejo(w){
       ${w.fotos.length ? `<div class="fotos">${w.fotos.map(f=>`<div class="foto"><img src="${fotoUrl(f)}" alt="Print do produto" loading="lazy" data-zoom></div>`).join('')}</div>` : ''}
     </div></div>`;
 }
+function renderChecklist(){
+  const el = $('#checklist'); if (!el) return;
+  const itens = [...checklist.itens].sort((a,b)=>(a.feito?1:0)-(b.feito?1:0));
+  const feitos = itens.filter(i=>i.feito).length;
+  $('#chk-conta').textContent = itens.length ? `${feitos} de ${itens.length}` : '';
+  el.innerHTML = itens.map(i=>`<div class="item chk ${i.feito?'feito':''}">
+      <label><input type="checkbox" data-chk="${i.id}" ${i.feito?'checked':''}><span>${esc(i.txt)}</span></label>
+      <button type="button" class="x" data-rmchk="${i.id}" aria-label="Remover item">×</button></div>`).join('')
+    || '<p class="vazio" style="margin:8px 0 0">Nada aqui ainda. Anote o que não pode esquecer.</p>';
+  $('#chk-limpar').hidden = !feitos;
+}
+async function salvarChecklist(){
+  clearTimeout(chkTimer); chkPendente = true;
+  try{
+    const r = await api('checklist', {method:'PUT', body:JSON.stringify(checklist), headers:{'content-type':'application/json'}});
+    if (!r.ok) throw 0;
+    chkPendente = false; $('#chk-erro') && ($('#chk-erro').hidden = true);
+  }catch{
+    $('#chk-erro') && ($('#chk-erro').hidden = false);
+    chkTimer = setTimeout(salvarChecklist, 4000);
+  }
+}
 function renderResumo(){
   const grupos = {};
   for (const w of dados.desejos) (grupos[w.loja || 'Qualquer loja'] ??= []).push(w);
@@ -371,6 +404,16 @@ function renderResumo(){
   const quando = dados.atualizado ? new Date(dados.atualizado).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : null;
   $('#app').innerHTML = `
   ${seletorModo()}
+  <section class="bloco">
+    <h2>Meu checklist <span class="conta" id="chk-conta"></span></h2>
+    <form class="novo" id="novoItem" autocomplete="off">
+      <input type="text" id="novoTxt" placeholder="ex.: meias para a Yasmin" maxlength="200" enterkeyhint="done" aria-label="Novo item">
+      <button class="btn" type="submit">Adicionar</button>
+    </form>
+    <div id="checklist"></div>
+    <p class="aviso" id="chk-erro" hidden style="margin:10px 0 0">Sem conexão — vou tentar salvar de novo.</p>
+    <button type="button" class="link" id="chk-limpar" hidden>limpar concluídos</button>
+  </section>
   <section class="bloco">
     <h2>Medidas</h2>
     <p class="dica">${quando ? `Atualizado em ${quando}${dados.concluido?' · <b style="color:var(--verde)">Nádia concluiu ✓</b>':''}` : 'Nada preenchido ainda.'} <button type="button" class="link" id="recarregar">atualizar</button></p>
@@ -387,6 +430,7 @@ function renderResumo(){
   </section>
   ${dados.recado ? `<section class="bloco"><h2>Recado</h2><p style="white-space:pre-wrap;margin:10px 0 0">${esc(dados.recado)}</p></section>` : ''}`;
   $('#barra').hidden = true;
+  renderChecklist();
 }
 function seletorModo(){
   return `<div class="modos" role="tablist">
@@ -442,6 +486,10 @@ document.addEventListener('input', e => {
 document.addEventListener('change', async e => {
   const t = e.target;
   if (t.dataset.up){ await enviarFotos(t.dataset.up, t.files); }
+  if (t.dataset.chk){
+    const it = checklist.itens.find(i=>i.id===t.dataset.chk); if (it) it.feito = t.checked;
+    renderChecklist(); salvarChecklist();
+  }
   if (t.dataset.comprado){
     comprado[t.dataset.comprado] = t.checked; if (!t.checked) delete comprado[t.dataset.comprado];
     t.closest('.item').classList.toggle('feito', t.checked);
@@ -468,6 +516,8 @@ document.addEventListener('click', async e => {
     dados.desejos = dados.desejos.filter(x=>x.id!==d.rm); renderDesejos(); agendar(); return; }
   if (d.rmfoto){ const w = dados.desejos.find(x=>x.id===t.closest('[data-wid]').dataset.wid);
     w.fotos = w.fotos.filter(f=>f!==d.rmfoto); api('foto/'+d.rmfoto, {method:'DELETE'}).catch(()=>{}); renderDesejos(); agendar(); return; }
+  if (d.rmchk){ checklist.itens = checklist.itens.filter(i=>i.id!==d.rmchk); renderChecklist(); salvarChecklist(); return; }
+  if (t.id==='chk-limpar'){ checklist.itens = checklist.itens.filter(i=>!i.feito); renderChecklist(); salvarChecklist(); return; }
   if (t.id==='recarregar'){ await carregar(true); return; }
   if (t.id==='concluir'){
     dados.concluido = new Date().toISOString(); pendente = true;
@@ -476,6 +526,13 @@ document.addEventListener('click', async e => {
       $('#app').insertAdjacentHTML('afterbegin', `<div class="bloco" style="background:#e9f5ee;border-color:#bfe0cd"><h2>Prontinho! 💛</h2><p style="margin:8px 0 0">Recebi tudo. Confere o resumo abaixo — se quiser mudar algo, é só voltar em “Preencher”.</p></div>`);
       $('#app').prepend($('.modos')); }
     return; }
+});
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'novoItem') return;
+  e.preventDefault();
+  const inp = $('#novoTxt'), txt = inp.value.trim(); if (!txt) return;
+  checklist.itens.push({id:novoId(), txt, feito:false}); inp.value = '';
+  renderChecklist(); salvarChecklist(); inp.focus();
 });
 $('#zoom').addEventListener('click', () => $('#zoom').close());
 document.addEventListener('paste', e => {
@@ -491,6 +548,7 @@ async function carregar(silencioso){
     if (!r.ok) throw 0;
     const j = await r.json();
     dados = normalizar(j.data); comprado = j.comprado || {};
+    if (!chkPendente) checklist = { itens: Array.isArray(j.checklist?.itens) ? j.checklist.itens : [] };
     if (!silencioso){
       try{ const rasc = JSON.parse(localStorage.getItem('lista-rascunho'));
         if (rasc && (!dados.atualizado || (rasc.atualizado||'') >= dados.atualizado)){ dados = normalizar(rasc); pendente = true; setTimeout(salvar, 300); } }catch{}

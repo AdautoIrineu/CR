@@ -4,6 +4,7 @@ import { getStore } from "@netlify/blobs";
 const MAX_DOC_BYTES = 300_000;
 const MAX_PHOTO_BYTES = 4_000_000;
 const PHOTO_ID = /^[a-f0-9-]{36}$/;
+const DOCS = new Set(["lista", "comprado", "checklist"]);
 
 const json = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "no-store" } });
@@ -29,14 +30,15 @@ export default async (req: Request, _context: Context) => {
   const [resource, id] = url.pathname.replace(/^\/api\//, "").split("/").filter(Boolean);
 
   if (resource === "lista" && req.method === "GET") {
-    const [data, comprado] = await Promise.all([
+    const [data, comprado, checklist] = await Promise.all([
       store.get("lista", { type: "json" }),
       store.get("comprado", { type: "json" }),
+      store.get("checklist", { type: "json" }),
     ]);
-    return json({ data, comprado: comprado ?? {} });
+    return json({ data, comprado: comprado ?? {}, checklist: checklist ?? { itens: [] } });
   }
 
-  if ((resource === "lista" || resource === "comprado") && req.method === "PUT") {
+  if (DOCS.has(resource) && req.method === "PUT") {
     const body = await readJsonObject(req);
     if (!body) return json({ error: "dados inválidos" }, 400);
     await store.setJSON(resource, body);
