@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1f4e8c">
+<title>Lista de Lisboa</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#1f4e8c; --azul-esc:#12305a; --azul-claro:#e6eef8;
+  --creme:#fbf6ec; --papel:#fffdf8; --amarelo:#f2b632; --telha:#c9542f;
+  --tinta:#1c2433; --suave:#5d6779; --linha:#e3dccb; --verde:#2f7d57;
+  --raio:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--creme);color:var(--tinta);font:16px/1.5 "DM Sans",system-ui,sans-serif;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+
+.topo{background:var(--azul);color:#fff;padding:28px 20px 56px;position:relative;overflow:hidden}
+.topo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:28px;
+  background:
+    radial-gradient(circle at 14px 14px,var(--amarelo) 3px,transparent 3.5px) 0 0/28px 28px,
+    linear-gradient(45deg,transparent 46%,#fff 46% 54%,transparent 54%) 0 0/28px 28px,
+    linear-gradient(-45deg,transparent 46%,#fff 46% 54%,transparent 54%) 0 0/28px 28px,
+    var(--azul-esc)}
+.topo .in{max-width:680px;margin:0 auto}
+.topo .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;font-weight:700}
+.topo h1{font-size:clamp(30px,8vw,42px);margin:6px 0 10px}
+.topo p{margin:0;max-width:46ch;opacity:.92}
+
+main{max-width:680px;margin:0 auto;padding:0 16px}
+.modos{display:flex;gap:6px;background:var(--papel);border:1px solid var(--linha);border-radius:999px;padding:5px;margin:-24px auto 20px;position:relative;z-index:2;box-shadow:0 6px 20px rgba(18,48,90,.12)}
+.modos button{flex:1;border:0;background:none;border-radius:999px;padding:11px 8px;font-weight:700;color:var(--suave)}
+.modos button[aria-selected=true]{background:var(--azul);color:#fff}
+
+.bloco{background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);padding:20px 16px;margin-bottom:16px}
+.bloco>h2{font-size:23px;display:flex;align-items:baseline;gap:10px}
+.bloco>h2 .n{font-family:"DM Sans";font-size:13px;font-weight:700;background:var(--amarelo);color:var(--azul-esc);border-radius:999px;padding:2px 9px;transform:translateY(-3px)}
+.dica{color:var(--suave);font-size:14.5px;margin:6px 0 16px}
+
+.abas{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px}
+.abas button{border:1.5px solid var(--linha);background:#fff;border-radius:12px;padding:9px 2px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.abas button small{font-weight:500;font-size:11.5px;color:var(--suave)}
+.abas button[aria-selected=true]{border-color:var(--azul);background:var(--azul-claro);color:var(--azul-esc)}
+.abas button.ok::after{content:"✓ ok";font-size:11px;color:var(--verde);font-weight:700}
+
+.grade{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grade.tres{grid-template-columns:repeat(3,1fr)}
+.f{display:block;min-width:0}
+.f.larga{grid-column:1/-1}
+.f>span{display:block;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.f>span i{font-style:normal;font-weight:400;color:var(--suave)}
+input[type=text],input[type=number],input[type=url],select,textarea{width:100%;border:1.5px solid var(--linha);background:#fff;border-radius:12px;padding:11px 12px;min-height:46px;outline:0}
+textarea{min-height:76px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro)}
+.sub{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);margin:22px 0 10px}
+
+.rapido,.multi{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.rapido button,.multi button{border:1.5px solid var(--linha);background:#fff;border-radius:999px;padding:6px 12px;font-size:14px;min-height:36px}
+.rapido button{padding:5px 10px;font-size:13.5px;color:var(--suave)}
+.multi button[aria-pressed=true],.rapido button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+
+details{border:1.5px dashed var(--linha);border-radius:12px;padding:10px 12px;margin-top:16px}
+details summary{font-weight:700;cursor:pointer}
+details[open] summary{margin-bottom:12px}
+
+.btn{border:0;border-radius:12px;padding:13px 18px;font-weight:700;background:var(--azul);color:#fff;min-height:48px}
+.btn.claro{background:var(--azul-claro);color:var(--azul-esc)}
+.btn.sol{background:var(--amarelo);color:var(--azul-esc)}
+.btn.cheio{width:100%}
+.link{border:0;background:none;color:var(--telha);font-weight:700;padding:8px 0;text-decoration:underline}
+
+.desejo{border:1.5px solid var(--linha);border-radius:14px;padding:14px;margin-bottom:12px;background:#fff}
+.desejo header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.desejo header b{font-family:Fraunces,serif;font-size:18px}
+.fotos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fotos .foto{position:relative;width:86px;height:86px;border-radius:10px;overflow:hidden;background:var(--azul-claro)}
+.fotos img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.fotos .x{position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(18,48,90,.85);color:#fff;font-weight:700;line-height:1}
+.fotos .mais{width:86px;height:86px;border:2px dashed var(--azul);border-radius:10px;display:grid;place-items:center;text-align:center;font-size:12.5px;font-weight:700;color:var(--azul);cursor:pointer;background:var(--azul-claro);padding:4px}
+.fotos .mais input{position:absolute;opacity:0;width:1px;height:1px}
+.fotos .carregando{display:grid;place-items:center;font-size:12px;color:var(--azul-esc)}
+.estrela{display:flex;align-items:center;gap:8px;font-weight:700;margin-top:12px}
+.estrela input{width:22px;height:22px;accent-color:var(--amarelo)}
+
+.barra{position:fixed;left:0;right:0;bottom:0;background:rgba(255,253,248,.96);backdrop-filter:blur(8px);border-top:1px solid var(--linha);padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:5}
+.barra .in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.estado{flex:1;font-size:14px;color:var(--suave);min-width:0}
+.estado b{color:var(--verde)}
+.estado.erro b{color:var(--telha)}
+
+/* resumo */
+.cartao{border:1.5px solid var(--linha);border-radius:14px;background:#fff;padding:14px;margin-bottom:12px}
+.cartao h3{font-size:21px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cartao h3 small{font-family:"DM Sans";font-size:13.5px;font-weight:500;color:var(--suave)}
+.tams{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.tam{background:var(--azul-claro);border-radius:10px;padding:8px 10px;min-width:0}
+.tam span{display:block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--azul)}
+.tam b{font-size:20px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.tam em{display:block;font-style:normal;font-size:12.5px;color:var(--azul-esc)}
+.linhas{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14.5px}
+.linhas dt{color:var(--suave)}
+.linhas dd{margin:0;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tags span{background:#fdf0cf;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:500}
+.item{display:flex;gap:12px;align-items:flex-start;border-top:1px solid var(--linha);padding:12px 0}
+.item:first-of-type{border-top:0}
+.item input[type=checkbox]{width:26px;height:26px;accent-color:var(--verde);flex:none;margin-top:2px}
+.item .corpo{flex:1;min-width:0}
+.item.feito .corpo{opacity:.5;text-decoration:line-through}
+.item .fotos{margin:8px 0 0}
+.item p{margin:0;overflow-wrap:anywhere}
+.item .meta{font-size:13.5px;color:var(--suave)}
+.loja-t{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);margin:18px 0 0}
+.vazio{color:var(--suave);font-style:italic}
+.novo{display:flex;gap:8px;margin:12px 0 4px}
+.novo input{flex:1;min-width:0}
+.novo .btn{flex:none;padding:11px 16px}
+.item.chk{align-items:center}
+.item.chk label{flex:1;min-width:0;display:flex;gap:12px;align-items:center;cursor:pointer}
+.item.chk label span{overflow-wrap:anywhere;min-width:0}
+.item.chk.feito label span{opacity:.5;text-decoration:line-through}
+.item.chk .x{flex:none;width:34px;height:34px;border-radius:50%;border:0;background:none;color:var(--suave);font-size:20px;line-height:1}
+.conta{font-family:"DM Sans";font-size:13.5px;font-weight:500;color:var(--suave)}
+.aviso{background:#fdf0cf;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:14px}
+
+dialog{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh}
+dialog::backdrop{background:rgba(10,20,40,.9)}
+dialog img{max-width:96vw;max-height:92vh;display:block;border-radius:8px}
+.centro{text-align:center;padding:60px 20px}
+@media (max-width:380px){.grade.tres{grid-template-columns:1fr 1fr}.tams{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:no-preference){.btn,.multi button,.abas button{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<header class="topo"><div class="in">
+  <div class="eyebrow">Compras em Lisboa</div>
+  <h1>Lista das meninas 🛍️</h1>
+  <p id="intro">Amor, preenche aqui as medidas e o que vocês querem. Salva sozinho — pode fazer aos poucos e voltar quando quiser.</p>
+</div></header>
+
+<main id="app"><div class="centro">Carregando…</div></main>
+
+<div class="barra" id="barra" hidden><div class="in">
+  <div class="estado" id="estado"></div>
+  <button class="btn sol" id="concluir">Concluí ✓</button>
+</div></div>
+
+<dialog id="zoom"><img alt="Print ampliado"></dialog>
+
+<script>
+const K = new URLSearchParams(location.search).get('k') || '';
+const PESSOAS = [
+  {id:'diana', nome:'Diana', tag:'gêmea'},
+  {id:'ingrid', nome:'Ingrid', tag:'gêmea'},
+  {id:'yasmin', nome:'Yasmin', tag:'filha'},
+  {id:'nadia', nome:'Nádia', tag:'você', adulta:true},
+];
+const LOJAS = ['Primark','H&M','Kiko Milano','Adidas','Zara','Pull&Bear','Bershka','Stradivarius','Mango','Lefties','C&A','Nike','Decathlon','Sephora','Parfois','El Corte Inglés'];
+const PRECISA = ['Camisetas / blusas','Calças / jeans','Shorts / saias','Vestidos','Casacos / moletons','Pijamas','Roupa íntima / meias','Roupa de esporte','Tênis','Sandálias / sapatos','Bolsas / mochilas','Acessórios','Maquiagem / beleza'];
+const TAM_INF = ['4','6','8','10','12','14','16','PP','P','M'];
+const TAM_ADU = ['PP','P','M','G','GG','36','38','40','42','44'];
+const PE_INF = ['28','30','32','33','34','35','36','37','38'];
+const PE_ADU = ['34','35','36','37','38','39','40'];
+
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const novoId = () => Math.random().toString(36).slice(2, 10);
+const fotoUrl = id => `/api/foto/${id}?k=${encodeURIComponent(K)}`;
+
+let dados = { pessoas:{}, lojas:[], outrasLojas:'', recado:'', desejos:[], concluido:null };
+let comprado = {};
+let checklist = { itens: [] };
+let chkPendente = false, chkTimer = null;
+let modo = location.hash === '#resumo' ? 'resumo' : 'form';
+let aba = 'diana';
+let pendente = false, timer = null, enviando = 0;
+
+const api = (caminho, opts={}) => fetch('/api/' + caminho, {...opts, headers:{'x-key':K, ...(opts.headers||{})}});
+
+function normalizar(d){
+  const base = { pessoas:{}, lojas:[], outrasLojas:'', recado:'', desejos:[], concluido:null, ...(d||{}) };
+  for (const p of PESSOAS) base.pessoas[p.id] = { precisa:[], ...(base.pessoas[p.id]||{}) };
+  base.desejos = (base.desejos||[]).map(w => ({ fotos:[], ...w }));
+  return base;
+}
+
+/* ---------- salvar ---------- */
+function estado(txt, erro=false){ const e=$('#estado'); e.innerHTML=txt; e.classList.toggle('erro',erro); }
+function agendar(){
+  pendente = true; estado('Salvando…');
+  try{ localStorage.setItem('lista-rascunho', JSON.stringify(dados)); }catch{}
+  clearTimeout(timer); timer = setTimeout(salvar, 900);
+}
+async function salvar(){
+  clearTimeout(timer);
+  if (!pendente) return true;
+  pendente = false;
+  dados.atualizado = new Date().toISOString();
+  try{
+    const r = await api('lista', {method:'PUT', body:JSON.stringify(dados), headers:{'content-type':'application/json'}});
+    if (!r.ok) throw 0;
+    if (!pendente) estado('<b>✓ Tudo salvo</b>');
+    try{ localStorage.removeItem('lista-rascunho'); }catch{}
+    return true;
+  }catch{
+    pendente = true;
+    estado('<b>Sem conexão</b> — tentando de novo…', true);
+    timer = setTimeout(salvar, 4000);
+    return false;
+  }
+}
+addEventListener('visibilitychange', () => { if (document.hidden) salvar(); else if (modo==='resumo' && !pendente && !chkPendente && document.activeElement?.id !== 'novoTxt') carregar(true); });
+
+/* ---------- formulário ---------- */
+function campo(p, k, rotulo, o={}){
+  const v = esc(dados.pessoas[p][k]);
+  const attrs = `data-p="${p}" data-k="${k}" placeholder="${esc(o.ph||'')}"`;
+  const ctrl = o.area ? `<textarea ${attrs}>${v}</textarea>`
+    : `<input type="${o.num?'number':'text'}" ${o.num?'inputmode="decimal" step="any" min="0"':''} ${attrs} value="${v}">`;
+  const rapido = o.rapido ? `<div class="rapido">${o.rapido.map(x=>`<button type="button" data-fill="${p}.${k}" data-v="${x}" class="${dados.pessoas[p][k]===x?'on':''}">${x}</button>`).join('')}</div>` : '';
+  return `<label class="f ${o.larga?'larga':''}"><span>${rotulo}${o.opc?' <i>(opcional)</i>':''}</span>${ctrl}</label>${rapido?`<div class="f larga" style="margin-top:-8px">${rapido}</div>`:''}`;
+}
+function basicoOk(p){ const d=dados.pessoas[p]; return !!(d.altura && (d.cima||d.baixo) && d.pe); }
+
+function painelPessoa(p){
+  const a = p.adulta, id = p.id, d = dados.pessoas[id];
+  const tams = a ? TAM_ADU : TAM_INF;
+  return `
+  ${id==='ingrid' ? `<button type="button" class="btn claro cheio" id="copiar" style="margin-bottom:14px">Gêmeas iguais? Copiar medidas da Diana</button>` : ''}
+  <div class="grade ${a?'':'tres'}">
+    ${a ? '' : campo(id,'idade','Idade',{num:1,ph:'anos'})}
+    ${campo(id,'altura','Altura (cm)',{num:1,ph:a?'165':'135'})}
+    ${campo(id,'peso','Peso (kg)',{num:1,opc:1})}
+  </div>
+  <div class="sub">Roupas — tamanho que usa no Brasil</div>
+  <div class="grade">
+    ${campo(id,'cima','Parte de cima',{ph:a?'ex.: M ou 40':'ex.: 10',larga:1,rapido:tams})}
+    ${campo(id,'baixo','Parte de baixo (calça/short)',{ph:a?'ex.: 40':'ex.: 10',larga:1,rapido:tams})}
+  </div>
+  <div class="sub">Calçados</div>
+  <div class="grade">
+    ${campo(id,'pe','Número (Brasil)',{ph:a?'ex.: 37':'ex.: 33',larga:1,rapido:a?PE_ADU:PE_INF})}
+    ${campo(id,'peCm','Comprimento do pé (cm)',{num:1,opc:1,ph:'do calcanhar ao dedão',larga:1})}
+  </div>
+  <details ${d.busto||d.cintura||d.quadril||d.sutia||d.calcinha?'open':''}>
+    <summary>Medidas com fita métrica ${a?'e lingerie ':''}<span style="font-weight:400;color:var(--suave)">(opcional)</span></summary>
+    <div class="grade tres">
+      ${campo(id,'busto',a?'Busto (cm)':'Tórax (cm)',{num:1})}
+      ${campo(id,'cintura','Cintura (cm)',{num:1})}
+      ${campo(id,'quadril','Quadril (cm)',{num:1})}
+    </div>
+    ${a ? `<div class="grade" style="margin-top:12px">${campo(id,'sutia','Sutiã',{ph:'ex.: 42B'})}${campo(id,'calcinha','Calcinha',{ph:'ex.: M'})}</div>` : ''}
+  </details>
+  <div class="sub">O que ${a?'você quer':'ela precisa'}?</div>
+  <div class="multi">${PRECISA.map(x=>`<button type="button" data-multi="${id}" data-v="${esc(x)}" aria-pressed="${d.precisa.includes(x)}">${x}</button>`).join('')}</div>
+  <div class="sub">Gostos</div>
+  <div class="grade">
+    ${campo(id,'cores','Cores favoritas',{ph:'ex.: rosa, lilás, preto',larga:1})}
+    ${campo(id,'gosta','Estilo / personagens / o que ama',{ph:a?'ex.: básico, alfaiataria, tons neutros':'ex.: Stitch, esportivo, brilho',larga:1})}
+    ${campo(id,'naoGosta','Não gosta / não usa',{ph:'ex.: gola alta, tecido que pinica',larga:1,opc:1})}
+    ${campo(id,'obs','Observações',{area:1,larga:1,opc:1,ph:'ex.: está crescendo rápido, comprar um número maior'})}
+  </div>`;
+}
+
+function cartaoDesejo(w, i){
+  const opt = (arr, sel) => arr.map(x=>`<option ${x===sel?'selected':''}>${esc(x)}</option>`).join('');
+  return `<div class="desejo" data-wid="${w.id}">
+    <header><b>Pedido ${i+1}</b><button type="button" class="link" data-rm="${w.id}">remover</button></header>
+    <div class="fotos">
+      ${w.fotos.map(f=>`<div class="foto"><img src="${fotoUrl(f)}" alt="Print do produto" loading="lazy" data-zoom><button type="button" class="x" data-rmfoto="${f}" aria-label="Remover print">×</button></div>`).join('')}
+      <label class="mais">＋ print ou foto<input type="file" accept="image/*" multiple data-up="${w.id}"></label>
+    </div>
+    <div class="grade">
+      <label class="f"><span>Para quem</span><select data-w="${w.id}" data-k="quem"><option value="">—</option>${opt([...PESSOAS.map(p=>p.nome),'As gêmeas','As três meninas','Todas'], w.quem)}</select></label>
+      <label class="f"><span>Loja</span><select data-w="${w.id}" data-k="loja"><option value="">Qualquer</option>${opt([...LOJAS,'Outra'], w.loja)}</select></label>
+      <label class="f larga"><span>O que é</span><input type="text" data-w="${w.id}" data-k="desc" value="${esc(w.desc)}" placeholder="ex.: moletom cinza com capuz"></label>
+      <label class="f"><span>Tamanho</span><input type="text" data-w="${w.id}" data-k="tam" value="${esc(w.tam)}"></label>
+      <label class="f"><span>Cor</span><input type="text" data-w="${w.id}" data-k="cor" value="${esc(w.cor)}"></label>
+      <label class="f larga"><span>Link <i>(opcional)</i></span><input type="url" inputmode="url" data-w="${w.id}" data-k="link" value="${esc(w.link)}" placeholder="cole o link do produto"></label>
+    </div>
+    <label class="estrela"><input type="checkbox" data-w="${w.id}" data-k="prio" ${w.prio?'checked':''}> ⭐ Quero muito este</label>
+  </div>`;
+}
+function renderDesejos(){
+  $('#desejos').innerHTML = dados.desejos.map(cartaoDesejo).join('') ||
+    `<p class="vazio">Nenhum pedido ainda. Viu algo no Instagram ou no site da loja? Tira um print e adiciona aqui.</p>`;
+}
+function renderAbas(){
+  $('#abas').innerHTML = PESSOAS.map(p=>`<button type="button" role="tab" data-aba="${p.id}" aria-selected="${aba===p.id}" class="${basicoOk(p.id)?'ok':''}">${p.nome}<small>${p.tag}</small></button>`).join('');
+}
+function renderPainel(){ $('#painel').innerHTML = painelPessoa(PESSOAS.find(p=>p.id===aba)); }
+
+function renderForm(){
+  $('#app').innerHTML = `
+  ${seletorModo()}
+  <section class="bloco">
+    <h2><span class="n">1</span>Medidas</h2>
+    <p class="dica">Toque em cada nome. O essencial é <b>altura, tamanho de roupa e número do calçado</b> — o resto ajuda, mas é opcional.</p>
+    <div class="abas" id="abas" role="tablist"></div>
+    <div id="painel"></div>
+  </section>
+  <section class="bloco">
+    <h2><span class="n">2</span>Lojas</h2>
+    <p class="dica">Marque as que você quer que eu passe. Se não marcar nada, vou nas que der.</p>
+    <div class="multi">${LOJAS.map(x=>`<button type="button" data-loja="${esc(x)}" aria-pressed="${dados.lojas.includes(x)}">${x}</button>`).join('')}</div>
+    <label class="f" style="margin-top:14px"><span>Outras lojas <i>(opcional)</i></span><input type="text" data-g="outrasLojas" value="${esc(dados.outrasLojas)}" placeholder="ex.: Flying Tiger, Normal, Women'secret"></label>
+  </section>
+  <section class="bloco">
+    <h2><span class="n">3</span>Pedidos específicos</h2>
+    <p class="dica">Produtos que você já sabe que quer. Pode subir quantos prints quiser em cada pedido.</p>
+    <div id="desejos"></div>
+    <button type="button" class="btn claro cheio" id="add">＋ Adicionar pedido</button>
+  </section>
+  <section class="bloco">
+    <h2>Recado</h2>
+    <p class="dica">Qualquer coisa que eu precise saber: orçamento, prioridades, o que não comprar…</p>
+    <textarea data-g="recado" placeholder="Escreve aqui">${esc(dados.recado)}</textarea>
+  </section>`;
+  renderAbas(); renderPainel(); renderDesejos();
+  $('#barra').hidden = false; $('#concluir').hidden = false;
+  if (!$('#estado').textContent) estado(dados.atualizado ? '<b>✓ Tudo salvo</b>' : 'Salva sozinho enquanto você preenche');
+}
+
+/* ---------- resumo ---------- */
+const TAM_EU = [[92,'1½–2'],[98,'2–3'],[104,'3–4'],[110,'4–5'],[116,'5–6'],[122,'6–7'],[128,'7–8'],[134,'8–9'],[140,'9–10'],[146,'10–11'],[152,'11–12'],[158,'12–13'],[164,'13–14'],[170,'14+']];
+function euInfantil(altura){
+  const h = parseFloat(altura); if (!h || h < 80 || h > 172) return '';
+  const t = TAM_EU.find(([cm]) => cm >= h) || TAM_EU.at(-1);
+  return `EU ${t[0]} cm · ${t[1]} anos`;
+}
+function euCalcado(br){ const n = parseFloat(String(br).replace(',','.')); return n ? `≈ EU ${n+2}` : ''; }
+function euAdulta(t){ const n = parseInt(t,10); return (n>=34 && n<=54 && String(t).trim()==String(n)) ? `≈ EU ${n-2}` : ''; }
+
+function cartaoPessoa(p){
+  const d = dados.pessoas[p.id];
+  const tam = (rot, val, extra) => `<div class="tam"><span>${rot}</span><b>${esc(val)||'—'}</b>${extra?`<em>${extra}</em>`:''}</div>`;
+  const linhas = [
+    ['Peso', d.peso && d.peso+' kg'], [p.adulta?'Busto':'Tórax', d.busto && d.busto+' cm'], ['Cintura', d.cintura && d.cintura+' cm'],
+    ['Quadril', d.quadril && d.quadril+' cm'], ['Sutiã', d.sutia], ['Calcinha', d.calcinha], ['Pé', d.peCm && d.peCm+' cm'],
+    ['Cores', d.cores], ['Gosta', d.gosta], ['Não gosta', d.naoGosta], ['Obs.', d.obs],
+  ].filter(l => l[1]);
+  const vazio = !d.altura && !d.cima && !d.baixo && !d.pe && !linhas.length && !d.precisa.length;
+  return `<div class="cartao">
+    <h3>${p.nome}<small>${[d.idade && d.idade+' anos', d.altura && d.altura+' cm'].filter(Boolean).join(' · ')}</small></h3>
+    ${vazio ? '<p class="vazio">Ainda não preenchido.</p>' : `
+    <div class="tams">
+      ${tam('Cima', d.cima, p.adulta ? euAdulta(d.cima) : '')}
+      ${tam('Baixo', d.baixo, p.adulta ? euAdulta(d.baixo) : '')}
+      ${tam('Pé BR', d.pe, euCalcado(d.pe))}
+    </div>
+    ${!p.adulta && euInfantil(d.altura) ? `<div class="aviso">Pela altura, procurar na etiqueta: <b>${euInfantil(d.altura)}</b></div>` : ''}
+    ${linhas.length ? `<dl class="linhas">${linhas.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join('')}</dl>` : ''}
+    ${d.precisa.length ? `<div class="tags">${d.precisa.map(x=>`<span>${esc(x)}</span>`).join('')}</div>` : ''}`}
+  </div>`;
+}
+function itemDesejo(w){
+  const feito = !!comprado[w.id];
+  const meta = [w.quem, w.tam && 'tam. '+w.tam, w.cor].filter(Boolean).map(esc).join(' · ');
+  const link = /^https?:\/\//i.test(w.link||'') ? ` · <a href="${esc(w.link)}" target="_blank" rel="noopener">abrir link</a>` : '';
+  return `<div class="item ${feito?'feito':''}">
+    <input type="checkbox" data-comprado="${w.id}" ${feito?'checked':''} aria-label="Comprado">
+    <div class="corpo">
+      <p><b>${w.prio?'⭐ ':''}${esc(w.desc) || 'Ver print'}</b></p>
+      <p class="meta">${meta}${link}</p>
+      ${w.fotos.length ? `<div class="fotos">${w.fotos.map(f=>`<div class="foto"><img src="${fotoUrl(f)}" alt="Print do produto" loading="lazy" data-zoom></div>`).join('')}</div>` : ''}
+    </div></div>`;
+}
+function renderChecklist(){
+  const el = $('#checklist'); if (!el) return;
+  const itens = [...checklist.itens].sort((a,b)=>(a.feito?1:0)-(b.feito?1:0));
+  const feitos = itens.filter(i=>i.feito).length;
+  $('#chk-conta').textContent = itens.length ? `${feitos} de ${itens.length}` : '';
+  el.innerHTML = itens.map(i=>`<div class="item chk ${i.feito?'feito':''}">
+      <label><input type="checkbox" data-chk="${i.id}" ${i.feito?'checked':''}><span>${esc(i.txt)}</span></label>
+      <button type="button" class="x" data-rmchk="${i.id}" aria-label="Remover item">×</button></div>`).join('')
+    || '<p class="vazio" style="margin:8px 0 0">Nada aqui ainda. Anote o que não pode esquecer.</p>';
+  $('#chk-limpar').hidden = !feitos;
+}
+async function salvarChecklist(){
+  clearTimeout(chkTimer); chkPendente = true;
+  try{
+    const r = await api('checklist', {method:'PUT', body:JSON.stringify(checklist), headers:{'content-type':'application/json'}});
+    if (!r.ok) throw 0;
+    chkPendente = false; $('#chk-erro') && ($('#chk-erro').hidden = true);
+  }catch{
+    $('#chk-erro') && ($('#chk-erro').hidden = false);
+    chkTimer = setTimeout(salvarChecklist, 4000);
+  }
+}
+function renderResumo(){
+  const grupos = {};
+  for (const w of dados.desejos) (grupos[w.loja || 'Qualquer loja'] ??= []).push(w);
+  const lojas = [...dados.lojas, ...(dados.outrasLojas ? [dados.outrasLojas] : [])];
+  const quando = dados.atualizado ? new Date(dados.atualizado).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : null;
+  $('#app').innerHTML = `
+  ${seletorModo()}
+  <section class="bloco">
+    <h2>Meu checklist <span class="conta" id="chk-conta"></span></h2>
+    <form class="novo" id="novoItem" autocomplete="off">
+      <input type="text" id="novoTxt" placeholder="ex.: meias para a Yasmin" maxlength="200" enterkeyhint="done" aria-label="Novo item">
+      <button class="btn" type="submit">Adicionar</button>
+    </form>
+    <div id="checklist"></div>
+    <p class="aviso" id="chk-erro" hidden style="margin:10px 0 0">Sem conexão — vou tentar salvar de novo.</p>
+    <button type="button" class="link" id="chk-limpar" hidden>limpar concluídos</button>
+  </section>
+  <section class="bloco">
+    <h2>Medidas</h2>
+    <p class="dica">${quando ? `Atualizado em ${quando}${dados.concluido?' · <b style="color:var(--verde)">Nádia concluiu ✓</b>':''}` : 'Nada preenchido ainda.'} <button type="button" class="link" id="recarregar">atualizar</button></p>
+    <div class="aviso">Conversões aproximadas: calçado EU = BR + 2; roupa adulta EU = BR − 2. Infantil na Europa vai pela altura em cm. Sempre conferir na etiqueta.</div>
+    ${PESSOAS.map(cartaoPessoa).join('')}
+  </section>
+  <section class="bloco">
+    <h2>Lojas</h2>
+    ${lojas.length ? `<div class="tags" style="margin-top:12px">${lojas.map(x=>`<span>${esc(x)}</span>`).join('')}</div>` : '<p class="vazio" style="margin:10px 0 0">Nenhuma loja marcada.</p>'}
+  </section>
+  <section class="bloco">
+    <h2>Pedidos específicos</h2>
+    ${dados.desejos.length ? Object.entries(grupos).map(([l,ws])=>`<div class="loja-t">${esc(l)}</div>${ws.sort((a,b)=>(b.prio?1:0)-(a.prio?1:0)).map(itemDesejo).join('')}`).join('') : '<p class="vazio" style="margin:10px 0 0">Nenhum pedido ainda.</p>'}
+  </section>
+  ${dados.recado ? `<section class="bloco"><h2>Recado</h2><p style="white-space:pre-wrap;margin:10px 0 0">${esc(dados.recado)}</p></section>` : ''}`;
+  $('#barra').hidden = true;
+  renderChecklist();
+}
+function seletorModo(){
+  return `<div class="modos" role="tablist">
+    <button type="button" role="tab" data-modo="form" aria-selected="${modo==='form'}">✏️ Preencher</button>
+    <button type="button" role="tab" data-modo="resumo" aria-selected="${modo==='resumo'}">🧾 Resumo p/ compras</button></div>`;
+}
+function render(){ modo==='resumo' ? renderResumo() : renderForm(); }
+
+/* ---------- fotos ---------- */
+async function comprimir(file){
+  try{
+    const bmp = await createImageBitmap(file);
+    const s = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width*s); c.height = Math.round(bmp.height*s);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .82));
+    if (blob) return blob;
+  }catch{}
+  return file;
+}
+async function enviarFotos(wid, files){
+  const w = dados.desejos.find(x=>x.id===wid); if (!w) return;
+  const lista = [...files].filter(f=>f.type.startsWith('image/') || !f.type);
+  if (!lista.length) return;
+  enviando += lista.length; estado(`Enviando ${enviando} print(s)…`);
+  let falhas = 0;
+  for (const f of lista){
+    try{
+      const blob = await comprimir(f);
+      const r = await api('foto', {method:'POST', body:blob, headers:{'content-type': blob.type || 'image/jpeg'}});
+      if (!r.ok) throw 0;
+      w.fotos.push((await r.json()).id);
+    }catch{ falhas++; }
+    enviando--;
+  }
+  renderDesejos(); agendar();
+  if (falhas) alert(`Não consegui enviar ${falhas} imagem(ns). Tenta de novo, por favor.`);
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.up) return;
+  const val = t.type==='checkbox' ? t.checked : t.value;
+  if (t.dataset.p){ dados.pessoas[t.dataset.p][t.dataset.k] = val; renderAbas();
+    t.closest('.grade')?.querySelectorAll(`[data-fill="${t.dataset.p}.${t.dataset.k}"]`).forEach(b=>b.classList.toggle('on', b.dataset.v===val)); }
+  else if (t.dataset.w){ const w = dados.desejos.find(x=>x.id===t.dataset.w); if (w) w[t.dataset.k] = val; }
+  else if (t.dataset.g){ dados[t.dataset.g] = val; }
+  else return;
+  agendar();
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.dataset.up){ await enviarFotos(t.dataset.up, t.files); }
+  if (t.dataset.chk){
+    const it = checklist.itens.find(i=>i.id===t.dataset.chk); if (it) it.feito = t.checked;
+    renderChecklist(); salvarChecklist();
+  }
+  if (t.dataset.comprado){
+    comprado[t.dataset.comprado] = t.checked; if (!t.checked) delete comprado[t.dataset.comprado];
+    t.closest('.item').classList.toggle('feito', t.checked);
+    api('comprado', {method:'PUT', body:JSON.stringify(comprado), headers:{'content-type':'application/json'}}).catch(()=>{});
+  }
+});
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button, img[data-zoom]'); if (!t) return;
+  const d = t.dataset;
+  if ('zoom' in d){ $('#zoom img').src = t.src; $('#zoom').showModal(); return; }
+  if (d.modo){ if (d.modo===modo) return; await salvar(); modo = d.modo; history.replaceState(null,'',location.search + (modo==='resumo'?'#resumo':'')); if (modo==='resumo') await carregar(true); else render(); scrollTo(0,0); return; }
+  if (d.aba){ aba = d.aba; renderAbas(); renderPainel(); return; }
+  if (d.fill){ const [p,k] = d.fill.split('.'); dados.pessoas[p][k] = d.v; renderAbas(); renderPainel(); agendar(); return; }
+  if (d.multi){ const arr = dados.pessoas[d.multi].precisa; const i = arr.indexOf(d.v); i<0 ? arr.push(d.v) : arr.splice(i,1); t.setAttribute('aria-pressed', i<0); agendar(); return; }
+  if (d.loja){ const i = dados.lojas.indexOf(d.loja); i<0 ? dados.lojas.push(d.loja) : dados.lojas.splice(i,1); t.setAttribute('aria-pressed', i<0); agendar(); return; }
+  if (t.id==='copiar'){
+    const {precisa, cores, gosta, naoGosta, obs, ...medidas} = dados.pessoas.diana;
+    Object.assign(dados.pessoas.ingrid, medidas); renderAbas(); renderPainel(); agendar(); return; }
+  if (t.id==='add'){ const w = {id:novoId(), fotos:[]}; dados.desejos.push(w); renderDesejos(); agendar();
+    $(`[data-wid="${w.id}"]`).scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  if (d.rm){ const w = dados.desejos.find(x=>x.id===d.rm);
+    if (w && (w.fotos.length || w.desc) && !confirm('Remover este pedido?')) return;
+    w?.fotos.forEach(f => api('foto/'+f, {method:'DELETE'}).catch(()=>{}));
+    dados.desejos = dados.desejos.filter(x=>x.id!==d.rm); renderDesejos(); agendar(); return; }
+  if (d.rmfoto){ const w = dados.desejos.find(x=>x.id===t.closest('[data-wid]').dataset.wid);
+    w.fotos = w.fotos.filter(f=>f!==d.rmfoto); api('foto/'+d.rmfoto, {method:'DELETE'}).catch(()=>{}); renderDesejos(); agendar(); return; }
+  if (d.rmchk){ checklist.itens = checklist.itens.filter(i=>i.id!==d.rmchk); renderChecklist(); salvarChecklist(); return; }
+  if (t.id==='chk-limpar'){ checklist.itens = checklist.itens.filter(i=>!i.feito); renderChecklist(); salvarChecklist(); return; }
+  if (t.id==='recarregar'){ await carregar(true); return; }
+  if (t.id==='concluir'){
+    dados.concluido = new Date().toISOString(); pendente = true;
+    estado('Salvando…');
+    if (await salvar()){ modo = 'resumo'; history.replaceState(null,'',location.search+'#resumo'); render(); scrollTo(0,0);
+      $('#app').insertAdjacentHTML('afterbegin', `<div class="bloco" style="background:#e9f5ee;border-color:#bfe0cd"><h2>Prontinho! 💛</h2><p style="margin:8px 0 0">Recebi tudo. Confere o resumo abaixo — se quiser mudar algo, é só voltar em “Preencher”.</p></div>`);
+      $('#app').prepend($('.modos')); }
+    return; }
+});
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'novoItem') return;
+  e.preventDefault();
+  const inp = $('#novoTxt'), txt = inp.value.trim(); if (!txt) return;
+  checklist.itens.push({id:novoId(), txt, feito:false}); inp.value = '';
+  renderChecklist(); salvarChecklist(); inp.focus();
+});
+$('#zoom').addEventListener('click', () => $('#zoom').close());
+document.addEventListener('paste', e => {
+  const alvo = e.target.closest?.('[data-wid]'); const imgs = [...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));
+  if (alvo && imgs.length){ e.preventDefault(); enviarFotos(alvo.dataset.wid, imgs); }
+});
+
+/* ---------- início ---------- */
+async function carregar(silencioso){
+  try{
+    const r = await api('lista');
+    if (r.status === 401) return $('#app').innerHTML = `<div class="centro"><h2>Link incompleto</h2><p>Abra o link exatamente como foi enviado (com o código no final).</p></div>`;
+    if (!r.ok) throw 0;
+    const j = await r.json();
+    dados = normalizar(j.data); comprado = j.comprado || {};
+    if (!chkPendente) checklist = { itens: Array.isArray(j.checklist?.itens) ? j.checklist.itens : [] };
+    if (!silencioso){
+      try{ const rasc = JSON.parse(localStorage.getItem('lista-rascunho'));
+        if (rasc && (!dados.atualizado || (rasc.atualizado||'') >= dados.atualizado)){ dados = normalizar(rasc); pendente = true; setTimeout(salvar, 300); } }catch{}
+    }
+    render();
+  }catch{
+    $('#app').innerHTML = `<div class="centro"><h2>Não consegui carregar</h2><p>Verifique a internet e tente de novo.</p><button class="btn" onclick="location.reload()">Tentar de novo</button></div>`;
+  }
+}
+if (modo==='resumo') $('#intro').textContent = 'Medidas, lojas e pedidos — tudo num lugar só para consultar na loja.';
+carregar();
+</script>
+</body>
+</html>
