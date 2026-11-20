@@ -275,7 +275,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px;
   margin-top: 10px; font-size: .9rem;
 }
-.mapa-legenda-t { font-weight: 640; color: var(--sol); }
+.mapa-legenda-t { font-weight: 660; color: var(--branco); }
 .mapa-legenda ul { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .mapa-legenda li { opacity: .38; transition: opacity .5s var(--ease); }
 .mapa-legenda li::before {
@@ -340,7 +340,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   color: var(--folha);
   margin-bottom: 6px;
 }
-.passo-etapa { font-weight: 660; font-stretch: 110%; color: var(--sol); }
+.passo-etapa { font-size: 1.2rem; font-weight: 680; font-stretch: 110%; color: var(--sol); }
 .passo h3 {
   font-size: clamp(1.6rem, 2.7vw, 2.5rem);
   font-stretch: 114%; font-weight: 700; line-height: 1.06; letter-spacing: -0.015em;

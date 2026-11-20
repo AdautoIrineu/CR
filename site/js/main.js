@@ -262,6 +262,11 @@
     if (!f) return;
     var erro = $('.pedido-erro', f), ok = $('.pedido-ok', f);
     var ZAP = 'https://wa.me/556193339398?text=';
+    var FALTA = {
+      nome: 'Informe seu nome para enviar o pedido.',
+      contato: 'Informe um WhatsApp ou e-mail para receber a resposta.',
+      mensagem: 'Conte o que você quer fazer na área para enviar o pedido.'
+    };
 
     function check() {
       var first = null;
@@ -271,7 +276,7 @@
         if (bad && !first) first = el;
       });
       if (first) {
-        erro.textContent = 'Preencha ' + first.labels[0].textContent.toLowerCase().replace(/\?$/, '') + ' para enviar o pedido.';
+        erro.textContent = FALTA[first.name] || 'Preencha os campos obrigatórios para enviar o pedido.';
         erro.hidden = false; first.focus();
         return false;
       }
@@ -369,11 +374,14 @@
       return;
     }
     var a = centro(docks[ativo]), b = centro(docks[ativo + 1]);
+    // O último voo entra pela lateral, na altura do destino, para não cruzar o formulário.
+    if (ativo === voo.length - 1) a = { x: window.innerWidth + b.d * 0.6, y: b.y, d: b.d };
     var t = voo[ativo]; t = t * t * (3 - 2 * t);
     var dist = Math.hypot(b.x - a.x, b.y - a.y);
     var x = lerp(a.x, b.x, t);
     var y = lerp(a.y, b.y, t) - Math.sin(Math.PI * t) * Math.min(120, dist * 0.16);
-    var d = lerp(a.d, b.d, t);
+    // O tamanho muda cedo ao encolher e tarde ao crescer: o disco passa pequeno sobre o texto.
+    var d = lerp(a.d, b.d, b.d < a.d ? 1 - Math.pow(1 - t, 3) : Math.pow(t, 3));
     sol.style.transform = 'translate3d(' + (x - d / 2).toFixed(1) + 'px,' + (y - d / 2).toFixed(1) + 'px,0) scale(' + (d / 480).toFixed(4) + ')';
     sol.style.visibility = 'visible';
     setDock(-1);
