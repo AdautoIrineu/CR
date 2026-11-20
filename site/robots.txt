@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://prospera-ambiental.netlify.app/sitemap.xml
