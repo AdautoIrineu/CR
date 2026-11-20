@@ -31,3 +31,15 @@ configuradas lá.
 
 Substituir `https://prospera-ambiental.netlify.app` em `site/index.html`
 (canonical, Open Graph e JSON-LD), `site/robots.txt` e `site/sitemap.xml`.
+Depois, acrescentar ao `netlify.toml` um redirecionamento 301 do endereço
+provisório para o domínio novo e enviar o sitemap no Google Search Console.
+
+## Publicação
+
+O projeto `prospera-ambiental` no Netlify recebe deploys manuais (não está
+ligado a este repositório). Para publicar a partir de uma máquina com o
+Netlify CLI autenticado:
+
+```bash
+netlify deploy --prod --dir site --site prospera-ambiental
+```

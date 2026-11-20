@@ -1,5 +1,4 @@
 User-agent: *
-Allow: /
-Disallow: /obrigado/
+Disallow:
 
 Sitemap: https://prospera-ambiental.netlify.app/sitemap.xml

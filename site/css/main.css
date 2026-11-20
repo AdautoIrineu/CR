@@ -193,7 +193,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border-radius: 50%;
   background: var(--sol);
 }
-.movimento .hero-texto, .movimento .hero .cena { visibility: hidden; }
+.movimento .hero .cena { visibility: hidden; }
 .cena-arvores {
   position: absolute; left: 93.75%; top: 53.6%;
   width: clamp(54px, 7.4vw, 124px);
@@ -206,6 +206,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
   padding: clamp(104px, 19vh, 190px) var(--gut) 0;
   max-width: 68rem;
 }
+.hero-olho {
+  margin-bottom: clamp(10px, 1.6vh, 18px);
+  font-size: clamp(.98rem, 1.25vw, 1.15rem);
+  font-weight: 660; font-stretch: 108%; line-height: 1.3;
+  color: var(--floresta);
+}
 .hero-titulo {
   font-size: clamp(2.1rem, min(6vw, 10.4vh), 6.4rem);
   font-stretch: 125%;
@@ -216,6 +222,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .hero-titulo .ln { display: block; overflow: hidden; padding-bottom: .09em; margin-bottom: -.09em; }
 .hero-titulo .ln > span { display: block; white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-titulo .ln > span { animation: sobe .95s var(--ease) both; }
+  .hero-titulo .ln:nth-child(2) > span { animation-delay: .09s; }
+  .hero-titulo .ln:nth-child(3) > span { animation-delay: .18s; }
+}
+@keyframes sobe { from { transform: translateY(112%); } }
 .hero-sub {
   margin-top: clamp(18px, 2.6vh, 30px);
   max-width: 33rem;
@@ -225,13 +237,22 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .hero-acoes { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(20px, 3.2vh, 34px); }
 
+.hero .btn-linha { background: var(--ceu); }
+.hero .btn-linha:hover { background: var(--mata); }
+
 @media (max-width: 700px) {
-  .hero .cena { top: 40%; }
-  .hero .cena-sol { left: 64%; --topo: 46%; --tam: 42vw; }
+  .hero .cena { top: 46%; }
+  .hero .cena-sol { left: 62%; --topo: 58%; --tam: 36vw; }
   .hero .cena-arvores { top: 53.4%; }
   .hero-titulo { font-size: min(9.6vw, 7.4vh); font-stretch: 116%; }
-  .hero-texto { padding-top: clamp(88px, 13vh, 130px); }
-  .hero-acoes .btn { flex: 1 1 auto; }
+  .hero-texto { padding-top: clamp(84px, 12vh, 124px); }
+  .hero-acoes { flex-wrap: nowrap; gap: 8px; }
+  .hero-acoes .btn { flex: 1 1 0; min-height: 50px; padding-inline: .5em; font-size: .94rem; }
+}
+@media (min-width: 701px) and (max-height: 720px) {
+  .hero .cena { top: 12%; bottom: -12%; }
+  .hero-texto { padding-top: 88px; }
+  .hero-titulo { font-size: min(6vw, 9.4vh); }
 }
 
 /* ---------- Colinas entre as dobras ---------- */

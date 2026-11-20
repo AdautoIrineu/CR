@@ -324,17 +324,24 @@
   setEscala('sitio');
   $$('.colina').forEach(function (s) { renderColina(s, 0.6); });
 
-  if (!motion) {
+  function estatico() {
+    html.classList.remove('movimento');
     if (mapaFig) mapaFig.dataset.step = '4';
+    if (mVarre) mVarre.setAttribute('height', 600);
     if (mSol) { marker.x = 170; marker.y = 340; placeMarker(); }
     onda.w = 1.1;
     if (brasilFig) brasilFig.classList.add('aceso');
     drawBrasil();
     window.addEventListener('resize', drawBrasil);
-    return;
   }
 
+  if (!motion) { estatico(); return; }
+  // Se algo falhar no movimento, a página volta ao estado estático e completo.
+  try { movimento(); } catch (e) { estatico(); if (window.console) console.error(e); }
+
   /* ================= Movimento ================= */
+
+  function movimento() {
 
   var gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
   gsap.registerPlugin(ScrollTrigger);
@@ -402,7 +409,7 @@
 
   bandState.o0 = bandState.o1 = bandState.o2 = 0;
   renderBands();
-  gsap.set([heroTexto, $('.hero .cena')], { visibility: 'visible' });
+  gsap.set($('.hero .cena'), { visibility: 'visible' });
 
   var intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
   intro
@@ -410,10 +417,7 @@
     .to(bandState, { o1: 1, duration: 1.3, onUpdate: renderBands }, 0.2)
     .to(bandState, { o2: 1, duration: 1.3, onUpdate: renderBands }, 0.35)
     .fromTo(heroSol, { '--nasce': 0 }, { '--nasce': 1, duration: 1.8, ease: 'power2.out' }, 0.15)
-    .fromTo(heroTrees, { scale: 0, transformOrigin: '50% 100%' }, { scale: 1, duration: 0.9, ease: 'back.out(1.6)' }, 0.9)
-    .fromTo('.hero-titulo .ln > span', { yPercent: 112 }, { yPercent: 0, duration: 1.1, stagger: 0.09 }, 0.25)
-    .fromTo('.hero-titulo', { fontStretch: '100%' }, { fontStretch: getComputedStyle($('.hero-titulo')).fontStretch, duration: 1.6, ease: 'power2.out', clearProps: 'fontStretch' }, 0.25)
-    .fromTo(['.hero-sub', '.hero-acoes'], { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.1 }, 0.75);
+    .fromTo(heroTrees, { scale: 0, transformOrigin: '50% 100%' }, { scale: 1, duration: 0.9, ease: 'back.out(1.6)' }, 0.9);
 
   var heroTl = gsap.timeline({ defaults: { ease: 'none' } });
   heroTl
@@ -514,4 +518,5 @@
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });
   if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { ScrollTrigger.refresh(); });
   updateSol();
+  }
 })();
