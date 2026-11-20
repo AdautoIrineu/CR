@@ -423,7 +423,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .retrato-sol { position: absolute; inset: 0; border-radius: 50%; background: var(--sol); }
 .retrato-disco img {
   position: relative; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
-  filter: grayscale(1) contrast(1.12) brightness(1.08);
+  filter: grayscale(1) contrast(1.08) brightness(1.24);
   mix-blend-mode: multiply;
 }
 .retrato figcaption { max-width: 19rem; font-size: .98rem; line-height: 1.45; }
